@@ -21,5 +21,4 @@ package="com.project.intership.cico">
     <activity android:name=".MainActivity" />
     <activity android:name=".InfoActivity"></activity>
 </application>
-
 </manifest>

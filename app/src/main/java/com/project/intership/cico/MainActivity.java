@@ -40,9 +40,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Bundle extras = getIntent().getExtras();
-        username = extras.getString("user_name");
         setClick();
+        if(true){btnCheckin.setVisibility(View.VISIBLE);}
+        Bundle extras = getIntent().getExtras();
+        username = extras.getString("user_name"); Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject JSon=new JSONObject(getIntent().getStringExtra("jsonString"));
+                            JSONObject data=JSon.getJSONObject("user_data");
+                            String name= data.getString("full_name");
+                            String mail=data.getString("email");
+                            Toast.makeText(getApplicationContext(),name+" "+mail,Toast.LENGTH_LONG).show();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
 
 
 //        btnInfo.setOnClickListener(new View.OnClickListener() {
@@ -66,15 +77,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
-        Intent in;
+
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
                 case R.id.btnInfo:
-                    Toast.makeText(getApplicationContext(),"avc",Toast.LENGTH_LONG).show();
-                    in = new Intent(getApplication(),InfoActivity.class);
-                    in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(in);
+                    manageActivity();
+
                     break;
                 case R.id.btnLogout:
                     logoutActivity();
@@ -86,10 +95,17 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.btnCheckout:
                     checkout_dialog();
                     break;
+
                 default: break;
             }
         }
     };
+
+    private void manageActivity() {
+        Intent in = new Intent(getApplication(),InfoActivity.class);
+        in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
+        startActivity(in);
+    }
 
     private void logoutActivity() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);

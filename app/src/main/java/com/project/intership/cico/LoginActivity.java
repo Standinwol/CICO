@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    private static String url_login = "http://192.168.1.9/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+    private static String url_login = "http://192.168.1.7/CICO/01.Server/checkin_checkout/public/index.php/user/login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +51,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (type()) {
 //                    test();
+                                            new Login().execute();
 /*                    Check check = new Check();
                     if(check.isConnectedToServer(url_login, 15000))*/
-                        new Login().execute();
+
 //                    else
 //                    Toast.makeText(getApplicationContext(),"Can not connect to server",Toast.LENGTH_LONG).show();
                 }
@@ -66,12 +67,19 @@ public class LoginActivity extends AppCompatActivity {
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
+        String data="{\"A\":\"a\",\"B\":\"b\",\"C\":\"c\"}";JSONObject test;
 
         {
             String username = txtUser.getText().toString();
             Intent login = new Intent(getApplicationContext(), MainActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             login.putExtra("user_name", username);
+            try {
+                test= new JSONObject(data);
+                login.putExtra("test",test.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
             startActivity(login);}
 
     }
@@ -125,19 +133,19 @@ public class LoginActivity extends AppCompatActivity {
                     Intent login = new Intent(getApplicationContext(), MainActivity.class);
                     login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     login.putExtra("user_name", username);
+                    login.putExtra("jsonString",response.toString());
                    // login.putExtra();
                     startActivity(login);
                     finish();
                 }
                 else {
-                    publishProgress();
+                    publishProgress("The user name or password is incorrect");
                 }
             } catch (JSONException e) {
-                Toast.makeText(getApplicationContext(),"JSON.",Toast.LENGTH_LONG).show();
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             } catch (Exception e){
-                Toast.makeText(getApplicationContext(),"An error occurred. Please try again.",Toast.LENGTH_LONG).show();
+                publishProgress("An error occurred. Please try again");
             }
 
             return null;
@@ -146,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onProgressUpdate(String... values) {
         super.onProgressUpdate(values);
-        Toast.makeText(getApplicationContext(),"The user name or password is incorrect",Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(),values[0],Toast.LENGTH_LONG).show();
     }
 }
 }
