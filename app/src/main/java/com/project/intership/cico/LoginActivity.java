@@ -12,8 +12,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.intership.cico.JSON.JSONParser;
-import com.project.intership.cico.R;
-import com.project.intership.cico.until.Check;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -25,8 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import com.project.intership.cico.until.Check;
 //import static com.example.giang.checkin_checkout.R.id.txtUser;
 
 public class LoginActivity extends AppCompatActivity {
