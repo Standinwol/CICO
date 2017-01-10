@@ -1,104 +1,139 @@
 package com.project.intership.cico;
 
-import android.annotation.TargetApi;
-import android.app.Dialog;
-import android.content.Context;
-import android.os.Build;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.example.toant.cico.R;
+import com.project.intership.cico.JSON.JSONParser;
+import com.project.intership.cico.R;
+
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+//import static com.example.giang.checkin_checkout.R.id.txtUser;
 
 public class LoginActivity extends AppCompatActivity {
+    EditText txtUser;
+    EditText txtPass;
+    Button btnLogin;
+    TextView text;
 
-    private Dialog dialog;
-    final Context context = this;
+
+
+    private static String url_login = "http://192.168.1.8/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-//        Button btnLogin = (Button)findViewById(R.id.btnLogin);
-//        final TextView fail = (TextView) findViewById(R.id.lfail);
-//        btnLogin.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                fail.setVisibility(View.VISIBLE);
-//
-//            }
-//        });
-        final Button btnCheckin = (Button) findViewById(R.id.btnCheckout);
-        btnCheckin.setOnClickListener(new View.OnClickListener() {
-            @TargetApi(Build.VERSION_CODES.N)
+        setContentView(R.layout.activity_login);
+        findViewById();
+
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-////                final Dialog dialog = new Dialog(this);
-//                LayoutInflater li = LayoutInflater.from(context);
-//                View promptsView = li.inflate(R.layout.checkin_dialog, null);
-//
-//                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-//                        context);
-//
-//                // set prompts.xml to alertdialog builder
-//                alertDialogBuilder.setView(promptsView);
-//
-//                // set dialog message
-//                alertDialogBuilder
-//                        .setCancelable(false)
-//                        .setPositiveButton("CHECK IN",
-//                                new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog,int id) {
-//                                        // get user input and set it to result
-//                                        // edit text
-//                                    }
-//                                })
-//                        .setNegativeButton("Cancel",
-//                                new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog,int id) {
-//                                        dialog.cancel();
-//                                    }
-//                                });
-//
-//                // create alert dialog
-//                AlertDialog alertDialog = alertDialogBuilder.create();
-//
-//                // show it
-//                alertDialog.show();
-
-                final Dialog dialog = new Dialog(context);
-                dialog.setContentView(R.layout.checkout_dialog);
-                dialog.setTitle("CHECK OUT");
-
-                // set the custom dialog components - text, image and button
-                TextView text1 = (TextView) dialog.findViewById(R.id.tv_day);
-//                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-YYYY HH:mm", Locale.getDefault());
-//                    Date date= new Date();
-//                    String curentDate = dateFormat.format(date);
-//                    text1.setText("shit");
-                EditText editText = (EditText) dialog.findViewById(R.id.edt_reason);
-
-                Button dialogButton = (Button) dialog.findViewById(R.id.co_action);
-                // if button is clicked, close the custom dialog
-               dialogButton.setOnClickListener(new View.OnClickListener() {
-                   @Override
-                   public void onClick(View v) {
-                       dialog.dismiss();
-                   }
-               });
-                Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
-                cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-                dialog.show();
+                if (type())test();
+//                             new Login().execute();
             }
         });
     }
 
+    private void test() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        Date date = new Date();
+        String currentDate = dateFormat.format(date);
+        text.setText(currentDate);
 
+        {
+            String username = txtUser.getText().toString();
+            Intent login = new Intent(getApplicationContext(), MainActivity.class);
+            login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            login.putExtra("user_name", username);
+            startActivity(login);}
+
+    }
+
+
+    private boolean type(){
+        String username = txtUser.getText().toString();
+        String pass = txtPass.getText().toString();
+        boolean check=false;
+        if(pass.isEmpty()) {
+            txtPass.setError("Password can not empty");
+        }
+        if(username.isEmpty()) {
+            txtUser.setError("User name can not empty");
+        }
+        else if(!username.matches("[a-zA-Z0-9_]+")) {
+            txtUser.setError("Please enter only letters, numbers and _");
+        }
+        else if(!pass.isEmpty()){check=true;};
+        return (check);
+    }
+
+    private void findViewById() {
+        text = (TextView) findViewById(R.id.lfail);
+        txtUser = (EditText) findViewById(R.id.txtUser);
+        txtPass = (EditText) findViewById(R.id.txtPass);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
+    }
+
+    private class Login extends AsyncTask<String , String, String> {
+        String username = txtUser.getText().toString();
+        String pass = txtPass.getText().toString();
+        JSONParser jParser = new JSONParser();
+        JSONObject json,response;
+
+    @Override
+        protected String doInBackground(String... args) {
+   //      String username = txtUser.getText().toString();
+
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("user_name", username));
+            params.add(new BasicNameValuePair("password", pass));
+            json = jParser.getJSONFromUrl(url_login, params);
+
+            String s = null;
+            try {
+                response = json.getJSONObject("response");
+                s = response.getString("login_status");
+                Log.d("Msg", response.getString("login_status"));
+                if (s.equals("true")) {
+                    Intent login = new Intent(getApplicationContext(), MainActivity.class);
+                    login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    login.putExtra("user_name", username);
+                    startActivity(login);
+                    finish();
+                }
+                else {
+                    publishProgress();
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(String... values) {
+        super.onProgressUpdate(values);
+        text.setText("The user name or password is incorrect");
+    }
+}
 }
