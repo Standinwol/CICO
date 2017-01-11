@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.intership.cico.JSON.JSONParser;
-import com.project.intership.cico.R;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -28,9 +27,9 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String url_login = "http://192.168.1.16/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+    private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
     JSONParser jParser = new JSONParser();
-    JSONObject json;
+    JSONObject json, JSON,data;
     String username;
     private Dialog dialog;
     Button btnLogout, btnInfo, btnCheckin, btnCheckout;
@@ -44,24 +43,6 @@ public class MainActivity extends AppCompatActivity {
         if(true){btnCheckin.setVisibility(View.VISIBLE);}
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name"); Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject JSon=new JSONObject(getIntent().getStringExtra("jsonString"));
-                            JSONObject data=JSon.getJSONObject("user_data");
-                            String name= data.getString("full_name");
-                            String mail=data.getString("email");
-                            Toast.makeText(getApplicationContext(),name+" "+mail,Toast.LENGTH_LONG).show();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-
-
-//        btnInfo.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getApplicationContext(),"avc",Toast.LENGTH_LONG).show();
-//            }
-//        });
     }
 
     private void setClick(){
@@ -102,7 +83,13 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void manageActivity() {
-        Intent in = new Intent(getApplication(),InfoActivity.class);
+        Intent in = new Intent(getApplication(),ManageActivity.class);
+//        try {
+//            data=new JSONObject(getIntent().getStringExtra("jsonUser"));
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+        in.putExtra("jsonUser",getIntent().getStringExtra("jsonUser"));
         in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
     }
@@ -116,8 +103,6 @@ public class MainActivity extends AppCompatActivity {
         // Setting Dialog Message
         alertDialog.setMessage("Are you sure you want logout?");
 
-        // Setting Icon to Dialog
-       // alertDialog.setIcon(R.drawable.delete);
 
         // Setting Positive "Yes" Button
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -149,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name");
-        Button dialogButton = (Button) dialog.findViewById(R.id.ci_action);
+        Button OK = (Button) dialog.findViewById(R.id.ci_action);
         TextView text = (TextView) dialog.findViewById(R.id.tv_day);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
@@ -157,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
         // if button is clicked, close the custom dialog
-        dialogButton.setOnClickListener(new View.OnClickListener() {
+        OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 checkinActivity();
@@ -192,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkinActivity();
+                checkoutActivity();
                 dialog.dismiss();
             }
         });

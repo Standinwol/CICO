@@ -37,7 +37,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    private static String url_login = "http://192.168.1.7/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+    private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,18 +122,18 @@ public class LoginActivity extends AppCompatActivity {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("user_name", username));
             params.add(new BasicNameValuePair("password", pass));
-        json = jParser.getJSONFromUrl(url_login, params);
-        String s = null;
-            try {
 
+            try {
+                json = jParser.getJSONFromUrl(url_login, params);
                 response = json.getJSONObject("response");
-                s = response.getString("login_status");
+                String status = response.getString("login_status");
                 Log.d("Msg", response.getString("login_status"));
-                if (s.equals("true")) {
+                if (status.equals("true")) {
                     Intent login = new Intent(getApplicationContext(), MainActivity.class);
                     login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     login.putExtra("user_name", username);
-                    login.putExtra("jsonString",response.toString());
+                    String data = response.getJSONObject("user_data").toString();
+                    login.putExtra("jsonUser",data);
                    // login.putExtra();
                     startActivity(login);
                     finish();
@@ -149,12 +149,12 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             return null;
-    }
+        }
 
-    @Override
-    protected void onProgressUpdate(String... values) {
-        super.onProgressUpdate(values);
-        Toast.makeText(getApplicationContext(),values[0],Toast.LENGTH_LONG).show();
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            Toast.makeText(getApplicationContext(),values[0],Toast.LENGTH_LONG).show();
+        }
     }
-}
 }
