@@ -14,6 +14,11 @@
             android:id="@+id/tv_day"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="dd/mm/yyyy"
+            android:textSize="20dp"
             >
             <requestFocus />
         </TextView>
@@ -25,14 +30,48 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:singleLine="true"
             android:background="@drawable/reason_box_state"
             android:textStyle="italic"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:weightSum="4">
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/ic_sosad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/ic_sosad"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/ic_sad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/ic_sad"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/ic_happy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/ic_happy"/>
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/ic_veryhappy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/ic_veryhappy"/>
+        </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:paddingTop="20dp"
+            android:paddingTop="10dp"
             android:paddingBottom="20dp"
             android:weightSum="2"
             >
