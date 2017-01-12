@@ -18,7 +18,7 @@
             <requestFocus />
         </TextView>
         <EditText
-            android:id="@+id/edt_reason"
+            android:id="@+id/txt_reason"
             android:layout_width="fill_parent"
             android:layout_height="30dp"
             android:hint="Reason"
