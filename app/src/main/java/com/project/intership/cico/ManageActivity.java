@@ -25,7 +25,6 @@ public class ManageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_manage);
 
         setClick();
-
         viewInfo();
 
     }
@@ -33,7 +32,6 @@ public class ManageActivity extends AppCompatActivity {
     private void setClick() {
         btnChangePass = (Button) findViewById(R.id.btnChangePass);
         btnBack = (Button) findViewById(R.id.btnBack);
-
         btnChangePass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,17 +53,17 @@ public class ManageActivity extends AppCompatActivity {
     protected void viewInfo(){
         name = (TextView) findViewById(R.id.name);
         add = (TextView) findViewById(R.id.add);
-        phone = (TextView) findViewById(R.id.phone);
         mail = (TextView) findViewById(R.id.mail);
+        phone = (TextView) findViewById(R.id.phone);
 //TODO get??? OK, must be putExtra & getStringExtra between MainActivity & ManageActivity
         try {
             JSONObject data = new JSONObject(getIntent().getStringExtra("jsonUser"));
             user_name = data.getString("full_name");
-
+         //   String meo=data.getString("email");
             name.setText(data.getString("full_name"));
             add.setText(data.getString("address"));
-            phone.setText(data.getString("phone"));
             mail.setText(data.getString("email"));
+            phone.setText(data.getString("phone"));
 //            JSONObject data=new JSONObject(getIntent().getStringExtra("test"));
 //            String sname= data.getString("A");
 //            String smail=data.getString("C");

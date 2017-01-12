@@ -75,7 +75,8 @@
             android:textSize="30dp"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:clickable="false"/>
     </LinearLayout>
 
 </LinearLayout>

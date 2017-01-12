@@ -47,8 +47,8 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (type()) {
-//                    test();
-                                            new Login().execute();
+                    test();
+//                                            new Login().execute();
 /*                    Check check = new Check();
                     if(check.isConnectedToServer(url_login, 15000))*/
 
@@ -64,16 +64,17 @@ public class LoginActivity extends AppCompatActivity {
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
-        String data="{\"A\":\"a\",\"B\":\"b\",\"C\":\"c\"}";JSONObject test;
+        String data="{\"full_name\":\"a\",\"address\":\"b,c,dn\",\"email\":\"c@gg.cc\"}";JSONObject test;
 
         {
             String username = txtUser.getText().toString();
             Intent login = new Intent(getApplicationContext(), MainActivity.class);
             login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             login.putExtra("user_name", username);
+
             try {
                 test= new JSONObject(data);
-                login.putExtra("test",test.toString());
+                login.putExtra("jsonUser",test.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -81,6 +82,12 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private void findViewById() {
+        text = (TextView) findViewById(R.id.lfail);
+        txtUser = (EditText) findViewById(R.id.txtUser);
+        txtPass = (EditText) findViewById(R.id.txtPass);
+        btnLogin = (Button) findViewById(R.id.btnLogin);
+    }
 
     private boolean type(){
         String username = txtUser.getText().toString();
@@ -97,13 +104,6 @@ public class LoginActivity extends AppCompatActivity {
         }
         else if(!pass.isEmpty()){check=true;};
         return (check);
-    }
-
-    private void findViewById() {
-        text = (TextView) findViewById(R.id.lfail);
-        txtUser = (EditText) findViewById(R.id.txtUser);
-        txtPass = (EditText) findViewById(R.id.txtPass);
-        btnLogin = (Button) findViewById(R.id.btnLogin);
     }
 
     private class Login extends AsyncTask<String , String, String> {

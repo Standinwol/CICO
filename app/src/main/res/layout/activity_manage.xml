@@ -137,7 +137,7 @@
             android:layout_marginBottom="10dp"
             android:text="Change Password"
             android:textColor="@color/white"
-            android:background="@drawable/btn_state"/>
+            android:background="@drawable/btn_check_pup_state"/>
     </LinearLayout>
     <!--<LinearLayout-->
         <!--android:id="@+id/tb1"-->

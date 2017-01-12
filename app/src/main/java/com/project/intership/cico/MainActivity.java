@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,7 +34,8 @@ public class MainActivity extends AppCompatActivity {
     JSONParser jParser = new JSONParser();
     JSONObject json, JSON,data;
     String username;
-    private Dialog dialog;
+    String icon = "";
+    Integer back = 0;
     Button btnLogout, btnInfo, btnCheckin, btnCheckout;
 
     @Override
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         setClick();
-        if(true){btnCheckin.setVisibility(View.VISIBLE);}
+        if(true){btnCheckout.setClickable(false);}
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name"); Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
     }
@@ -53,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
         btnCheckin = (Button) findViewById(R.id.btnCheckin);
         btnCheckout = (Button) findViewById(R.id.btnCheckout);
 
-        btnInfo.setOnClickListener(onClickListener);
-        btnLogout.setOnClickListener(onClickListener);
-        btnCheckin.setOnClickListener(onClickListener);
-        btnCheckout.setOnClickListener(onClickListener);
+        btnInfo.setOnClickListener(mainClick);
+        btnLogout.setOnClickListener(mainClick);
+        btnCheckin.setOnClickListener(mainClick);
+        btnCheckout.setOnClickListener(mainClick);
     }
 
     @Override
@@ -72,13 +74,13 @@ public class MainActivity extends AppCompatActivity {
         });
         alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+                dialog.dismiss();
             }
         });
         alertDialog.show();
     }
 
-    private View.OnClickListener onClickListener = new View.OnClickListener() {
+    private View.OnClickListener mainClick = new View.OnClickListener() {
 
         @Override
         public void onClick(View v) {
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
     private void manageActivity() {
         Intent in = new Intent(getApplication(),ManageActivity.class);
         //send jsonUser to ManageActivity,... data from Login
+        String s = getIntent().getStringExtra("jsonUser");
         in.putExtra("jsonUser",getIntent().getStringExtra("jsonUser"));
         in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
@@ -131,14 +134,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkin_dialog(){
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.checkin_dialog);
-        dialog.setTitle("CHECK IN");
+        final Dialog dialogin = new Dialog(this);
+        dialogin.setContentView(R.layout.checkin_dialog);
+        dialogin.setTitle("CHECK IN");
 
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name");
-        Button OK = (Button) dialog.findViewById(R.id.ci_action);
-        TextView text = (TextView) dialog.findViewById(R.id.tv_day);
+        Button OK = (Button) dialogin.findViewById(R.id.ci_action);
+        TextView text = (TextView) dialogin.findViewById(R.id.tv_day);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
@@ -147,56 +150,95 @@ public class MainActivity extends AppCompatActivity {
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
-                btnCheckin.setClickable(false);
-                btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
-                btnCheckout.setClickable(true);
                 checkinActivity();
-                dialog.dismiss();
+                dialogin.dismiss();
             }
         });
-        Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
+        Button cancel = (Button) dialogin.findViewById(R.id.cancel_action);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                dialogin.dismiss();
             }
         });
-        dialog.show();
+        dialogin.show();
     }
 
     private void checkout_dialog() {
-        final Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.checkin_dialog);
-        dialog.setTitle("CHECK OUT");
+        final Dialog dialogout = new Dialog(this);
+        dialogout.setContentView(R.layout.checkout_dialog);
+        dialogout.setTitle("CHECK OUT");
 
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name");
-        Button OK = (Button) dialog.findViewById(R.id.co_action);
-        Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
-        TextView text = (TextView) dialog.findViewById(R.id.tv_day);
+        Button checkout = (Button) dialogout.findViewById(R.id.co_action);
+        final Button cancel = (Button) dialogout.findViewById(R.id.cancel_action);
+
+        Button so_sad = (Button) dialogout.findViewById(R.id.ic_sosad);
+        Button sad = (Button) dialogout.findViewById(R.id.ic_sad);
+        Button happy = (Button) dialogout.findViewById(R.id.ic_happy);
+        Button very_happy = (Button) dialogout.findViewById(R.id.ic_veryhappy);
+
+        final TextView text = (TextView) dialogout.findViewById(R.id.tv_day);
+        final EditText txtReason = (EditText) dialogout.findViewById(R.id.txt_reason);
+        txtReason.setVisibility(View.GONE);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
 
-        OK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                checkoutActivity();
-                dialog.dismiss();
-            }
-        });
+        View.OnClickListener iconClick =new View.OnClickListener() {
 
-        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialog.dismiss();
+                switch (v.getId()) {
+                    case (R.id.ic_sosad):
+                        icon= "so sad";
+                        Toast.makeText(getApplicationContext(),icon,Toast.LENGTH_SHORT).show();
+                        break;
+                    case (R.id.ic_sad):
+                        icon= "sad";
+                        Toast.makeText(getApplicationContext(),icon,Toast.LENGTH_SHORT).show();
+                        break;
+                    case (R.id.ic_happy):
+                        icon= "happy";
+                        Toast.makeText(getApplicationContext(),icon,Toast.LENGTH_SHORT).show();
+                        break;
+                    case (R.id.ic_veryhappy):
+                        icon= "very happy";
+                        Toast.makeText(getApplicationContext(),icon,Toast.LENGTH_SHORT).show();
+                        break;
+                    case (R.id.co_action):
+                        String reason = txtReason.getText().toString();
+
+                        if(reason.isEmpty()){txtReason.setError("You must be type your Reason");}
+                        if(icon.isEmpty()) Toast.makeText(getApplicationContext(),"Please choose ICON",Toast.LENGTH_LONG).show();
+
+                        else if(txtReason.getVisibility()==View.GONE||!reason.isEmpty()){
+                            Toast.makeText(getApplicationContext(),reason,Toast.LENGTH_LONG).show();
+                            checkoutActivity();
+                            dialogout.dismiss();
+                        }
+                        break;
+                    case (R.id.cancel_action):
+                        dialogout.dismiss();
+                        break;
+                }
             }
-        });
-        dialog.show();
+        };
+
+        so_sad.setOnClickListener(iconClick);
+        sad.setOnClickListener(iconClick);
+        happy.setOnClickListener(iconClick);
+        very_happy.setOnClickListener(iconClick);
+        checkout.setOnClickListener(iconClick);
+        cancel.setOnClickListener(iconClick);
+
+        dialogout.show();
     }
+
+
 
     private void checkinActivity() {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -208,6 +250,10 @@ public class MainActivity extends AppCompatActivity {
             response = json.getJSONObject("response");
             s = response.getString("xxx_status");
             Log.d("Msg", response.getString("xxx_status"));
+            btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+            btnCheckin.setClickable(false);
+            btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
+            btnCheckout.setClickable(true);
             if (s.equals("true")) {
 //                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
 //                btnCheckin.setClickable(false);
@@ -249,6 +295,10 @@ public class MainActivity extends AppCompatActivity {
             response = json.getJSONObject("response");
             s = response.getString("xxx_status");
             Log.d("Msg", response.getString("xxx_status"));
+            btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+            btnCheckout.setClickable(false);
+            btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
+            btnCheckin.setClickable(true);
             if (s.equals("true")) {
 //                Intent login = new Intent(getApplicationContext(), MainActivity.class);
 //                login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -266,10 +316,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"An error occurred. Please try again.",Toast.LENGTH_LONG).show();
         }
         Toast.makeText(getApplicationContext(),time(),Toast.LENGTH_LONG).show();
-        btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
-        btnCheckout.setClickable(false);
-        btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
-        btnCheckin.setClickable(true);
+
     }
 
 
