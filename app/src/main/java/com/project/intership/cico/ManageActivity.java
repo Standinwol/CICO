@@ -43,6 +43,13 @@ public class ManageActivity extends AppCompatActivity {
                 startActivity(in);
             }
         });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     protected void viewInfo(){
@@ -64,7 +71,7 @@ public class ManageActivity extends AppCompatActivity {
 //            String smail=data.getString("C");
 //            name.setText(sname); mail.setText(smail);
 
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

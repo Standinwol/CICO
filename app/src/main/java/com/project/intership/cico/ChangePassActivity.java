@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.intership.cico.JSON.JSONParser;
+import com.project.intership.cico.until.Constant;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChangePassActivity extends AppCompatActivity {
-    private static String url = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+
     TextView txtOldPass, txtNewPass, txtConfirm;
     Button btnChange, btnCancel;
     String oldPass, newPass, confirm, user_name;
@@ -54,6 +55,13 @@ public class ChangePassActivity extends AppCompatActivity {
 
             }
         });
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private boolean checkPass(){
@@ -74,6 +82,7 @@ public class ChangePassActivity extends AppCompatActivity {
             fault = true;
         } else if(!confirm.equals(newPass)){
             txtConfirm.setError("Confirm wrong");
+            fault = true;
         }
         return fault;
     }
@@ -88,12 +97,12 @@ public class ChangePassActivity extends AppCompatActivity {
         @Override
         protected String doInBackground(String... args) {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
-            params.add(new BasicNameValuePair("user_name",user_name));
+            params.add(new BasicNameValuePair("user_name","admin"));
             params.add(new BasicNameValuePair("password",oldPass));
             params.add(new BasicNameValuePair("new_pass",newPass));
 
             try{
-                jParser.getJSONFromUrl(url,params);
+                json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN,params);
                 JSONObject response = json.getJSONObject("response");
                 String status = response.getString("login_status");
                 Log.d("Msg", response.getString("login_status"));
@@ -112,13 +121,12 @@ public class ChangePassActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
-            if(values[0]==0){
-                Intent in = new Intent(getApplication(),ManageActivity.class);
-                in.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(in);
+            if(values[0]==1){
+                Toast.makeText(getApplicationContext(),"Your password has been changed",Toast.LENGTH_LONG).show();
+                finish();
             }
-            else if(values[0]==1){
-                Toast.makeText(getApplicationContext(),"Please try again",Toast.LENGTH_LONG).show();
+            else if(values[0]==0){
+                Toast.makeText(getApplicationContext(),"Your password is incorrect",Toast.LENGTH_LONG).show();
             }
             else if(values[0]==-1){
                 Toast.makeText(getApplicationContext(),"An error occurred. Please try again",Toast.LENGTH_LONG).show();
