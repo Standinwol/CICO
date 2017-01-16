@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.intership.cico.JSON.JSONParser;
+import com.project.intership.cico.until.Constant;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -27,7 +29,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+   // private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
     JSONParser jParser = new JSONParser();
     JSONObject json, JSON,data;
     String username;
@@ -54,7 +56,26 @@ public class MainActivity extends AppCompatActivity {
         btnInfo.setOnClickListener(onClickListener);
         btnLogout.setOnClickListener(onClickListener);
         btnCheckin.setOnClickListener(onClickListener);
-        btnLogout.setOnClickListener(onClickListener);
+        btnCheckout.setOnClickListener(onClickListener);
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        alertDialog.setTitle("Close Application...");
+        alertDialog.setMessage("Are you sure you want quit?");
+        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                finish();
+          //      MainActivity.super.onBackPressed();
+            }
+        });
+        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        alertDialog.show();
     }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -84,11 +105,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void manageActivity() {
         Intent in = new Intent(getApplication(),ManageActivity.class);
-//        try {
-//            data=new JSONObject(getIntent().getStringExtra("jsonUser"));
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
+        //send jsonUser to ManageActivity,... data from Login
         in.putExtra("jsonUser",getIntent().getStringExtra("jsonUser"));
         in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
@@ -96,34 +113,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void logoutActivity() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-
-        // Setting Dialog Title
         alertDialog.setTitle("Confirm Logout...");
-
-        // Setting Dialog Message
         alertDialog.setMessage("Are you sure you want logout?");
-
-
-        // Setting Positive "Yes" Button
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int which) {
-
-                // Write your code here to invoke YES event
                 Intent in = new Intent(getApplication(),LoginActivity.class);
                 in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
                 startActivity(in);
             }
         });
-
-        // Setting Negative "NO" Button
         alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                // Write your code here to invoke NO event
                 dialog.cancel();
             }
         });
-
-        // Showing Alert Message
         alertDialog.show();
     }
 
@@ -141,10 +144,13 @@ public class MainActivity extends AppCompatActivity {
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
-        // if button is clicked, close the custom dialog
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+                btnCheckin.setClickable(false);
+                btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
+                btnCheckout.setClickable(true);
                 checkinActivity();
                 dialog.dismiss();
             }
@@ -167,13 +173,14 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         username = extras.getString("user_name");
         Button OK = (Button) dialog.findViewById(R.id.co_action);
+        Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
         TextView text = (TextView) dialog.findViewById(R.id.tv_day);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
-        // if button is clicked, close the custom dialog
+
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -181,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
-        Button cancel = (Button) dialog.findViewById(R.id.cancel_action);
+
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -195,13 +202,17 @@ public class MainActivity extends AppCompatActivity {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("user_name", username));
         try {
-            json = jParser.getJSONFromUrl(url_login, params);
+            json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN, params);
             JSONObject response;
             String s = null;
             response = json.getJSONObject("response");
             s = response.getString("xxx_status");
             Log.d("Msg", response.getString("xxx_status"));
             if (s.equals("true")) {
+//                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+//                btnCheckin.setClickable(false);
+//                btnCheckout.setBackgroundResource(R.drawable.btn_checkout_state);
+//                btnCheckout.setClickable(true);
 //                Intent login = new Intent(getApplicationContext(), MainActivity.class);
 //                login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //                login.putExtra("user_name", username);
@@ -232,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("user_name", username));
         try {
-            json = jParser.getJSONFromUrl(url_login, params);
+            json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN, params);
             JSONObject response;
             String s = null;
             response = json.getJSONObject("response");
@@ -255,6 +266,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"An error occurred. Please try again.",Toast.LENGTH_LONG).show();
         }
         Toast.makeText(getApplicationContext(),time(),Toast.LENGTH_LONG).show();
+        btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+        btnCheckout.setClickable(false);
+        btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
+        btnCheckin.setClickable(true);
     }
 
 

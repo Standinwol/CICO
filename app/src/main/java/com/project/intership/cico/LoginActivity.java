@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.project.intership.cico.JSON.JSONParser;
+import com.project.intership.cico.until.Constant;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
@@ -33,7 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+  //  private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
             params.add(new BasicNameValuePair("password", pass));
 
             try {
-                json = jParser.getJSONFromUrl(url_login, params);
+                json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN, params);
                 response = json.getJSONObject("response");
                 String status = response.getString("login_status");
                 Log.d("Msg", response.getString("login_status"));
