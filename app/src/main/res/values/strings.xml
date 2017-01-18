@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Checkin-Checkout</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="list_items">
+        <item>01/01/2011_08:30_17:30_ve som vi co viec ban</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+        <item>01/01/2011_08:30_17:30_abc</item>
+    </string-array>
+
 </resources>
