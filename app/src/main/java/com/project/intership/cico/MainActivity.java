@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
+import android.support.v4.os.AsyncTaskCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.os.AsyncTask;
 
 import com.project.intership.cico.JSON.JSONParser;
 import com.project.intership.cico.until.Constant;
@@ -32,8 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
    // private static String url_login = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
     JSONParser jParser = new JSONParser();
-    JSONObject json, JSON,data;
-    String username;
+    JSONObject json, JSON,data, responsee;
+    static String id, checkin_status;
     String icon = "";
     Integer back = 0;
     Button btnLogout, btnInfo, btnCheckin, btnCheckout;
@@ -42,11 +44,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        id = getIntent().getStringExtra("id");
+        checkin_status = getIntent().getStringExtra("checkin_status");
+    //    new ViewMain().execute();
         setClick();
-        if(true){btnCheckout.setClickable(false);}
-        Bundle extras = getIntent().getExtras();
-        username = extras.getString("user_name"); Toast.makeText(getApplicationContext(),username,Toast.LENGTH_LONG).show();
+        view(checkin_status);
+
     }
 
     private void setClick(){
@@ -61,10 +64,82 @@ public class MainActivity extends AppCompatActivity {
         btnCheckout.setOnClickListener(mainClick);
     }
 
+    private void view(String checkin_status) {
+
+        switch (checkin_status) {
+            //chưa check in
+            case "1":
+                btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+                btnCheckout.setClickable(false);
+                btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
+                btnCheckin.setClickable(true);
+                break;
+            //chưa check out
+            case "2":
+                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+                btnCheckin.setClickable(false);
+                btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
+                btnCheckout.setClickable(true);
+                break;
+            //đã check out
+            case "3":
+                btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+                btnCheckout.setClickable(false);
+                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+                btnCheckin.setClickable(false);
+        }
+    }
+
+
+
+//    private class ViewMain extends AsyncTask<String, String, String> {
+//
+//        @Override
+//        protected String doInBackground(String... args) {
+//            Bundle extras = getIntent().getExtras();
+//            id = extras.getString("id"); //Toast.makeText(getApplicationContext(),id,Toast.LENGTH_LONG).show();
+//            List<NameValuePair> params = new ArrayList<NameValuePair>();
+//            //      params.add(new BasicNameValuePair("id", id));
+//            try{
+//                json = jParser.getJSONFromUrl(Constant.URL_CHECK_STATUS+id,"GET",params);
+//                responsee = json.getJSONObject("response");
+//                String status = responsee.getString("checkin_status");
+//                publishProgress(status);
+//            }catch(JSONException e){}
+//            return null;
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(String... values) {
+//            super.onProgressUpdate(values);
+//            switch (values[0]){
+//                case "1":
+//                    btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+//                    btnCheckout.setClickable(false);
+//                    btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
+//                    btnCheckin.setClickable(true);
+//                    break;
+//                case "2":
+//                    btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+//                    btnCheckin.setClickable(false);
+//                    btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
+//                    btnCheckout.setClickable(true);
+//                    break;
+//                case "3":
+//                    btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
+//                    btnCheckout.setClickable(false);
+//                    btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
+//                    btnCheckin.setClickable(false);
+//            }
+//        }
+//    }
+
+
+
     @Override
     public void onBackPressed() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        alertDialog.setTitle("Close Application...");
+     //   alertDialog.setTitle("Close Application...");
         alertDialog.setMessage("Are you sure you want quit?");
         alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int which) {
@@ -108,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     private void manageActivity() {
         Intent in = new Intent(getApplication(),ManageActivity.class);
         //send jsonUser to ManageActivity,... data from Login
-        String s = getIntent().getStringExtra("jsonUser");
+     //   String s = getIntent().getStringExtra("jsonUser");
         in.putExtra("jsonUser",getIntent().getStringExtra("jsonUser"));
         in.setFlags(getIntent().FLAG_ACTIVITY_NEW_TASK);
         startActivity(in);
@@ -139,18 +214,18 @@ public class MainActivity extends AppCompatActivity {
         dialogin.setTitle("CHECK IN");
 
         Bundle extras = getIntent().getExtras();
-        username = extras.getString("user_name");
+        id = extras.getString("id");
         Button OK = (Button) dialogin.findViewById(R.id.ci_action);
         TextView text = (TextView) dialogin.findViewById(R.id.tv_day);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
         OK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                checkinActivity();
+                new CheckinActivity().execute();
                 dialogin.dismiss();
             }
         });
@@ -170,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         dialogout.setTitle("CHECK OUT");
 
         Bundle extras = getIntent().getExtras();
-        username = extras.getString("user_name");
+        id = extras.getString("id");
         Button checkout = (Button) dialogout.findViewById(R.id.co_action);
         final Button cancel = (Button) dialogout.findViewById(R.id.cancel_action);
 
@@ -181,12 +256,15 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView text = (TextView) dialogout.findViewById(R.id.tv_day);
         final EditText txtReason = (EditText) dialogout.findViewById(R.id.txt_reason);
-        txtReason.setVisibility(View.GONE);
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         text.setText(currentDate);
+
+        //TODO calculate time to view Reason
+     //   if(currentDate-)
+        txtReason.setVisibility(View.GONE);
 
         View.OnClickListener iconClick =new View.OnClickListener() {
 
@@ -216,8 +294,8 @@ public class MainActivity extends AppCompatActivity {
                         if(icon.isEmpty()) Toast.makeText(getApplicationContext(),"Please choose ICON",Toast.LENGTH_LONG).show();
 
                         else if(txtReason.getVisibility()==View.GONE||!reason.isEmpty()){
-                            Toast.makeText(getApplicationContext(),reason,Toast.LENGTH_LONG).show();
-                            checkoutActivity();
+   //                         Toast.makeText(getApplicationContext(),reason,Toast.LENGTH_LONG).show();
+                            new CheckoutActivity().execute();
                             dialogout.dismiss();
                         }
                         break;
@@ -240,85 +318,88 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    private void checkinActivity() {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("user_name", username));
-        try {
-            json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN, params);
-            JSONObject response;
-            String s = null;
-            response = json.getJSONObject("response");
-            s = response.getString("xxx_status");
-            Log.d("Msg", response.getString("xxx_status"));
-            btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
-            btnCheckin.setClickable(false);
-            btnCheckout.setBackgroundResource(R.drawable.btn_check_press);
-            btnCheckout.setClickable(true);
-            if (s.equals("true")) {
-//                btnCheckin.setBackgroundResource(R.drawable.btn_checkout_normal);
-//                btnCheckin.setClickable(false);
-//                btnCheckout.setBackgroundResource(R.drawable.btn_checkout_state);
-//                btnCheckout.setClickable(true);
-//                Intent login = new Intent(getApplicationContext(), MainActivity.class);
-//                login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                login.putExtra("user_name", username);
-//                startActivity(login);
-//                finish();
+    private class CheckinActivity extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... args) {
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            //  params.add(new BasicNameValuePair("user_name", id));
+            try { //TODO method
+                json = jParser.getJSONFromUrl(Constant.URL_CHECK+id+".json","PORT", params);
+                JSONObject response;
+                response = json.getJSONObject("response");
+                String s = response.getString("status_user");
+                //   Log.d("Msg", response.getString("xxx_status"));
+                if (s.equals("0")) {
+                    publishProgress("true");
+                }
+                else {
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (Exception e){
+                publishProgress("false");
             }
-            else {
-             //   publishProgress();
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e){
-            Toast.makeText(getApplicationContext(),"An error occurred. Please try again.",Toast.LENGTH_LONG).show();
+            return null;
         }
 
-        Toast.makeText(getApplicationContext(),time(),Toast.LENGTH_LONG).show();
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            if(values[0].equals("true")) {
+                view("2");
+                Toast.makeText(getApplicationContext(), "check in at " + time(), Toast.LENGTH_LONG).show();
+            }
+            else Toast.makeText(getApplicationContext(), "An error occurred. Please try again", Toast.LENGTH_LONG).show();
+        }
     }
 
     private String time() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault());
         Date date = new Date();
         String currentDate = dateFormat.format(date);
         return currentDate;
     }
 
-    private void checkoutActivity() {
-        List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("user_name", username));
-        try {
-            json = jParser.getJSONFromUrl(Constant.URL_API_LOGIN, params);
-            JSONObject response;
-            String s = null;
-            response = json.getJSONObject("response");
-            s = response.getString("xxx_status");
-            Log.d("Msg", response.getString("xxx_status"));
-            btnCheckout.setBackgroundResource(R.drawable.btn_checkout_normal);
-            btnCheckout.setClickable(false);
-            btnCheckin.setBackgroundResource(R.drawable.btn_check_press);
-            btnCheckin.setClickable(true);
-            if (s.equals("true")) {
-//                Intent login = new Intent(getApplicationContext(), MainActivity.class);
-//                login.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                login.putExtra("user_name", username);
-//                startActivity(login);
-//                finish();
-            }
-            else {
-                //   publishProgress();
-            }
-        } catch (JSONException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+
+    private class CheckoutActivity extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... args) {
+            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new )
+              params.add(new BasicNameValuePair("xxx", icon ));
+            try { //TODO method
+                json = jParser.getJSONFromUrl(Constant.URL_CHECK+id+".json","PUT", params);
+                JSONObject response;
+                response = json.getJSONObject("response");
+                String s = response.getString("status_user");
+                //   Log.d("Msg", response.getString("xxx_status"));
+                if (s.equals("0")) {
+                    publishProgress("true");
+                }
+                else {
+                }
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
         } catch (Exception e){
-            Toast.makeText(getApplicationContext(),"An error occurred. Please try again.",Toast.LENGTH_LONG).show();
+                publishProgress("false");
+            }
+
+            return null;
         }
-        Toast.makeText(getApplicationContext(),time(),Toast.LENGTH_LONG).show();
 
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            if(values[0].equals("true")) {
+                view("3");
+                Toast.makeText(getApplicationContext(), "check out at " + time(), Toast.LENGTH_LONG).show();
+            }
+            else Toast.makeText(getApplicationContext(), "An error occurred. Please try again", Toast.LENGTH_LONG).show();
+        }
     }
-
-
 
 }

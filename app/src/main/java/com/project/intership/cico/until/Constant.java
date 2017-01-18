@@ -6,5 +6,7 @@ package com.project.intership.cico.until;
 
 public class Constant {
 
-    public static String URL_API_LOGIN = "http://192.168.1.4/CICO/01.Server/checkin_checkout/public/index.php/user/login";
+    public static String URL_API_LOGIN = "http://nqhoang91.pythonanywhere.com/login";
+    public static String URL_CHECK_STATUS = "http://nqhoang91.pythonanywhere.com/checkinstatus/";
+    public static String URL_CHECK = "http://nqhoang91.pythonanywhere.com/timesheets/";
 }
